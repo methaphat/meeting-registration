@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  meeting-registration:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: meeting-registration-app
+    restart: unless-stopped
+    ports:
+      - "3030:3030"
+    environment:
+      - PORT=3030
+      - NODE_ENV=production
+      - ADMIN_PASSWORD=admin123
+      - SESSION_SECRET=meeting-registration-secret-key-change-in-production
+    volumes:
+      # Named volume สำหรับ SQLite database (persistent)
+      - meeting-data:/app/data
+    networks:
+      - meeting-network
+    # Healthcheck (optional)
+    # healthcheck:
+    #   test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:3030 || exit 1"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 40s
+
+volumes:
+  meeting-data:
+    driver: local
+    # ตั้งชื่อ volume (optional)
+    name: meeting-registration-data
+
+networks:
+  meeting-network:
+    driver: bridge
+

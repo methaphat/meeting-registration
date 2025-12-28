@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  meeting-registration:
+    build: .
+    container_name: meeting-registration-app
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3030}:3030"
+    environment:
+      - PORT=${PORT:-3030}
+      - NODE_ENV=production
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123}
+      - SESSION_SECRET=${SESSION_SECRET:-meeting-registration-secret-key-change-in-production}
+    volumes:
+      # Mount data directory สำหรับ SQLite database
+      - meeting-data:/app/data
+      # Mount .env file (optional - ถ้ามี)
+      - ./.env:/app/.env:ro
+    networks:
+      - meeting-network
+    # Healthcheck (comment out ถ้า image ไม่มี wget/curl)
+    # healthcheck:
+    #   test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3030"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 40s
+
+volumes:
+  meeting-data:
+    driver: local
+
+networks:
+  meeting-network:
+    driver: bridge
+

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบลงทะเบียนเข้าร่วมประชุม</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-icon">📅</div>
+            <h1 id="meetingTitleHeader">ระบบลงทะเบียนเข้าร่วมประชุม</h1>
+            <div id="meetingInfo" class="meeting-info-display">
+                <p class="meeting-detail" id="meetingDateDisplay"></p>
+                <p class="meeting-detail" id="meetingLocationDisplay"></p>
+                <p class="meeting-detail" id="meetingTimeDisplay"></p>
+            </div>
+            <p class="header-subtitle">กรุณากรอกข้อมูลเพื่อลงทะเบียนเข้าร่วมประชุม</p>
+            <a href="admin-login.html" class="admin-link">🔐 Admin Dashboard</a>
+        </header>
+
+        <div class="stats-section">
+            <div class="stat-card stat-total">
+                <div class="stat-icon">👥</div>
+                <div class="stat-number" id="totalCount">0</div>
+                <div class="stat-label">ผู้เข้าร่วมทั้งหมด</div>
+            </div>
+            <div class="stat-card stat-inperson">
+                <div class="stat-icon">📍</div>
+                <div class="stat-number" id="inPersonCount">0</div>
+                <div class="stat-label">พบหน้า</div>
+            </div>
+            <div class="stat-card stat-zoom">
+                <div class="stat-icon">💻</div>
+                <div class="stat-number" id="zoomCount">0</div>
+                <div class="stat-label">Zoom</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <section class="registration-section">
+                <h2>
+                    <span class="section-icon">👤+</span>
+                    ลงทะเบียนเข้าร่วมประชุม
+                </h2>
+                <form id="registrationForm">
+                    <div class="form-group">
+                        <label for="fullName">ชื่อ-นามสกุล</label>
+                        <input type="text" id="fullName" placeholder="กรอกชื่อ-นามสกุล" required>
+                    </div>
+                    <div class="form-group">
+                        <label>วิธีการเข้าร่วม</label>
+                        <div class="method-buttons">
+                            <button type="button" class="method-btn" data-method="in-person">
+                                พบหน้า
+                            </button>
+                            <button type="button" class="method-btn" data-method="zoom">
+                                Zoom
+                            </button>
+                        </div>
+                        <input type="hidden" id="participationMethod" required>
+                    </div>
+                    <button type="submit" class="submit-btn">ลงทะเบียน</button>
+                </form>
+            </section>
+
+            <section class="participants-section">
+                <h2>
+                    <span class="section-icon">👥</span>
+                    รายชื่อผู้ลงทะเบียน
+                </h2>
+                <div id="participantsList" class="participants-list">
+                    <p class="empty-message">ยังไม่มีผู้ลงทะเบียน</p>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+

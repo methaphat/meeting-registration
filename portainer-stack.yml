@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  meeting-registration:
+    image: meeting-registration:latest
+    container_name: meeting-registration-app
+    restart: unless-stopped
+    ports:
+      - "3030:3030"
+    environment:
+      - PORT=3030
+      - NODE_ENV=production
+      - ADMIN_PASSWORD=admin123
+      - SESSION_SECRET=meeting-registration-secret-key-change-in-production
+    volumes:
+      - meeting-data:/app/data
+    networks:
+      - meeting-network
+
+volumes:
+  meeting-data:
+    driver: local
+
+networks:
+  meeting-network:
+    driver: bridge
+

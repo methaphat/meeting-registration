@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - ระบบลงทะเบียนเข้าร่วมประชุม</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <header class="admin-header">
+            <div class="header-content">
+                <h1>🔐 Admin Dashboard</h1>
+                <p>ระบบจัดการข้อมูลผู้ลงทะเบียน</p>
+            </div>
+            <div class="header-actions">
+                <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+                <button class="refresh-btn" onclick="loadData()">🔄 รีเฟรช</button>
+                <button class="logout-btn" onclick="logout()">🚪 ออกจากระบบ</button>
+            </div>
+        </header>
+
+        <div class="admin-stats">
+            <div class="stat-card stat-total">
+                <div class="stat-icon">👥</div>
+                <div class="stat-number" id="adminTotalCount">0</div>
+                <div class="stat-label">ผู้เข้าร่วมทั้งหมด</div>
+            </div>
+            <div class="stat-card stat-inperson">
+                <div class="stat-icon">📍</div>
+                <div class="stat-number" id="adminInPersonCount">0</div>
+                <div class="stat-label">พบหน้า</div>
+            </div>
+            <div class="stat-card stat-zoom">
+                <div class="stat-icon">💻</div>
+                <div class="stat-number" id="adminZoomCount">0</div>
+                <div class="stat-label">Zoom</div>
+            </div>
+        </div>
+
+        <div class="admin-content">
+            <div class="data-section">
+                <div class="section-header">
+                    <h2>📋 รายชื่อผู้ลงทะเบียนทั้งหมด</h2>
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="🔍 ค้นหาชื่อ..." onkeyup="filterParticipants()">
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ลำดับ</th>
+                                <th>ชื่อ-นามสกุล</th>
+                                <th>วิธีการเข้าร่วม</th>
+                                <th>วันที่ลงทะเบียน</th>
+                                <th>จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="participantsTableBody">
+                            <tr>
+                                <td colspan="5" class="loading">กำลังโหลดข้อมูล...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="actions-section">
+                <div class="action-card">
+                    <h3>📅 ข้อมูลการประชุม</h3>
+                    <form id="meetingInfoForm">
+                        <div class="form-group">
+                            <label for="meetingTitle">หัวข้อการประชุม</label>
+                            <input type="text" id="meetingTitle" placeholder="กรอกหัวข้อการประชุม" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="meetingDate">วันที่</label>
+                            <input type="date" id="meetingDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="meetingLocation">สถานที่</label>
+                            <input type="text" id="meetingLocation" placeholder="กรอกสถานที่" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="meetingTime">เวลา</label>
+                            <input type="time" id="meetingTime" required>
+                        </div>
+                        <button type="submit" class="action-btn export-btn" style="width: 100%; margin-top: 10px;">
+                            💾 บันทึกข้อมูลการประชุม
+                        </button>
+                    </form>
+                </div>
+
+                <div class="action-card">
+                    <h3>⚙️ การจัดการ</h3>
+                    <div class="action-buttons">
+                        <button class="action-btn export-btn" onclick="exportToCSV()">
+                            📥 ส่งออก CSV
+                        </button>
+                        <button class="action-btn clear-btn" onclick="clearAllData()">
+                            🗑️ ลบข้อมูลทั้งหมด
+                        </button>
+                    </div>
+                </div>
+
+                <div class="action-card">
+                    <h3>📊 สถิติ</h3>
+                    <div class="info-list">
+                        <div class="info-item">
+                            <span class="info-label">อัปเดตล่าสุด:</span>
+                            <span class="info-value" id="lastUpdate">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">สถานะ API:</span>
+                            <span class="info-value" id="apiStatus">กำลังตรวจสอบ...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal สำหรับแก้ไขข้อมูล -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>✏️ แก้ไขข้อมูล</h3>
+                <span class="close" onclick="closeEditModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <input type="hidden" id="editId">
+                    <div class="form-group">
+                        <label for="editFullName">ชื่อ-นามสกุล</label>
+                        <input type="text" id="editFullName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>วิธีการเข้าร่วม</label>
+                        <div class="method-buttons">
+                            <button type="button" class="method-btn" data-method="in-person" onclick="selectMethod('in-person')">
+                                พบหน้า
+                            </button>
+                            <button type="button" class="method-btn" data-method="zoom" onclick="selectMethod('zoom')">
+                                Zoom
+                            </button>
+                        </div>
+                        <input type="hidden" id="editMethod" required>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="cancel-btn" onclick="closeEditModal()">ยกเลิก</button>
+                        <button type="submit" class="save-btn">บันทึก</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
+

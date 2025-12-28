@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  meeting-registration:
+    # ใช้ build ถ้าต้องการ build image ใหม่
+    # หรือ comment out build และ uncomment image: เพื่อใช้ image ที่ build แล้ว
+    build:
+      context: /docker/meeting-registration
+      dockerfile: /docker/meeting-registration/Dockerfile
+    # image: meeting-registration:latest  # Uncomment ถ้าใช้ image ที่ build แล้ว
+    container_name: meeting-registration-app
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3030}:3030"
+    environment:
+      - PORT=${PORT:-3030}
+      - NODE_ENV=production
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123}
+      - SESSION_SECRET=${SESSION_SECRET:-meeting-registration-secret-key-change-in-production}
+    volumes:
+      # Named volume สำหรับ SQLite database (persistent)
+      - meeting-data:/app/data
+    networks:
+      - meeting-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3030 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "com.docker.compose.project=meeting-registration"
+      - "traefik.enable=false"
+
+volumes:
+  meeting-data:
+    driver: local
+    name: meeting-registration-data
+
+networks:
+  meeting-network:
+    driver: bridge
+    name: meeting-registration-network
+
